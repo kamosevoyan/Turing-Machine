@@ -1,7 +1,7 @@
 #ifndef TURINGMACHINEINCLUDE
 #define TURINGMACHINEINCLUDE
 
-
+#include <iterator>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -9,6 +9,9 @@
 #include <algorithm>
 #include <vector>
 #include <tuple>
+#include <sys/ioctl.h>
+#include <stdio.h>
+#include <unistd.h>
 
 namespace TM
 {
@@ -30,7 +33,9 @@ namespace TM
 			int move(char);
 			char& get(int);
 			void write(char);
-			void print();
+			void print();			
+			size_t h,w;			
+			Tape();
 		};
 		
 		const std::string  dir{'<', '@', '>'};
@@ -41,8 +46,8 @@ namespace TM
 			TuringMachine(TuringMachine&&) = delete;
 			TuringMachine& operator=(const TuringMachine&) = delete;
 			
-			void setConfiguration(const std::string&) &;
-			void setInput(const std::string&) &;
+			bool setConfiguration(const std::stringstream&) &;
+			bool setInput(const std::string&) &;
 					
 		private:
 			std::string alphabetSymbols;
