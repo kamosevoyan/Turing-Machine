@@ -28,6 +28,7 @@ int main(int argc, char* argv[])
 		{
 			std::stringstream stream;
 			stream << File.rdbuf();
+			File.close();
 			
 			TM::TuringMachine machine;
 	
