@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
+void ui_handler(int, char*[]);
+
 namespace TM
 {
 	std::string strip(const std::string& input);
@@ -46,8 +48,8 @@ namespace TM
 			TuringMachine(TuringMachine&&) = delete;
 			TuringMachine& operator=(const TuringMachine&) = delete;
 			
-			bool setConfiguration(const std::stringstream&) &;
-			bool setInput(const std::string&) &;
+			void setConfiguration(const std::stringstream&) &;
+			void setInput(const std::string&) &;
 					
 		private:
 			std::string alphabetSymbols;
@@ -60,7 +62,6 @@ namespace TM
 			char emptySymbol;
 			Tape tape;
 			bool constructed = false;
-			
 			void print();
 
 	};

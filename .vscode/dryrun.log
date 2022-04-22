@@ -1,0 +1,7 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/kamo/github/Turing-Machine'
+g++ -Wall -c src/TuringMachine.cpp -o obj/TuringMachine.o
+g++ -Wall -c src/main.cpp -o obj/main.o
+g++ -Wall  ./obj/TuringMachine.o  ./obj/main.o -o TuringMachine
+make: Leaving directory '/home/kamo/github/Turing-Machine'
+ 

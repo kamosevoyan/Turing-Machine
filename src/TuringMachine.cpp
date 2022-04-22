@@ -1,7 +1,8 @@
 #include "TuringMachine.h"
-#define DEBUG
+//#define DEBUG
 
 size_t TM::TuringMachine::EXTEND_SIZE = 10;
+
 
 TM::TuringMachine::Tape::Tape()
 {
@@ -107,18 +108,16 @@ int TM::TuringMachine::Tape::move(char dir)
 }
 
 
-bool TM::TuringMachine::setInput(const std::string& input) & 
+void TM::TuringMachine::setInput(const std::string& input) & 
 {
 	if (!constructed)
 	{
-		std::cerr<<"Error: The machine has not been constructed yet.\n";
-		return false;
+		throw std::string("Error: The machine has not been constructed yet.\n");
 	}
 
 	if (input.length() == 0)
 	{
-		std::cerr << "Error: Null input\n";
-		return false;
+		throw std::string("Error: Null input\n");
 	}
 	
 	this->tape.set(input, this->emptySymbol);
@@ -139,9 +138,9 @@ bool TM::TuringMachine::setInput(const std::string& input) &
 #ifdef DEBUG
 		system("clear");
 		
-		std::cout << "Commands for debug: \n";//qqqq
+		std::cout << "Commands for debug: \n";
 		std::cout << "0: non stop mode: \n";
-		std::cout << "f: 10  steps: \n";
+		std::cout << "f: 25  steps: \n";
 		std::cout << "otherwise: 1 step\n\n\n\n";
 		
 		
@@ -178,13 +177,12 @@ bool TM::TuringMachine::setInput(const std::string& input) &
 		{
 			if ( (this->alphabetSymbols.find(read) != std::string::npos) && (std::find(this->stateSymbols.begin(), this->stateSymbols.end(), state) != this->stateSymbols.end()) )
 			{
-				std::cerr << "Error: Unexpected input: read " << read << " in state " << state << "\n";
+				throw std::string("Error: Unexpected input: read " + std::string(read, 1) + " in state " + state + "\n");
 			}
 			else
 			{
-				std::cerr<<"Error: Unknown input value " << read << std::endl;
+				throw std::string("Error: Unknown input value " + std::string(read, 1) + "\n");
 			}
-			return false;
 		}
 		
 		
@@ -200,7 +198,7 @@ bool TM::TuringMachine::setInput(const std::string& input) &
 #ifdef DEBUG
 	if (command == "f")
 	{
-		if (step % 10 != 0)
+		if (step % 25 != 0)
 		{
 			continue;
 		}
@@ -222,7 +220,6 @@ bool TM::TuringMachine::setInput(const std::string& input) &
 #endif
 		
 	}
-	return true;
 }
 
 TM::TuringMachine::TuringMachine()
@@ -230,14 +227,12 @@ TM::TuringMachine::TuringMachine()
 	
 }
 
-bool TM::TuringMachine::setConfiguration(const std::stringstream& stream) &
+void TM::TuringMachine::setConfiguration(const std::stringstream& stream) &
 {	
 	std::string alphabetSymbols;
 	std::vector<std::string> stateSymbols;
-	std::stringstream data;
-	
+	std::stringstream data;	
 	data << stream.rdbuf();
-	
 	std::string inOutAlphabet, states, lambdaDeltaNyu, token;
 
 	while(true)
@@ -271,8 +266,7 @@ bool TM::TuringMachine::setConfiguration(const std::stringstream& stream) &
 		}
 		else
 		{
-			std::cerr<<"Error: Input/output alphabet value "<< token <<" is already given"<<std::endl;
-			return false;
+			throw std::string("Error: Input/output alphabet value " + token + " is already given\n");
 		}
 	}
 	
@@ -286,8 +280,7 @@ bool TM::TuringMachine::setConfiguration(const std::stringstream& stream) &
 		
 		else
 		{
-			std::cerr<<"Error: State "<<token<<" is already given"<<std::endl;
-			return false;
+			throw std::string("Error: State " + token + " is already given\n");
 		}
 	}
 	
@@ -325,8 +318,7 @@ bool TM::TuringMachine::setConfiguration(const std::stringstream& stream) &
 			
 			if (data.tellg() == std::string::npos)
 			{
-				std::cerr<<"Error: Configuration values for state " << stateSymbols[row]<<" and below are not given\n";
-				return false;
+				throw  std::string("Error: Configuration values for state " + stateSymbols[row] + " and below are not given\n");
 			}
 		}
 			
@@ -338,8 +330,7 @@ bool TM::TuringMachine::setConfiguration(const std::stringstream& stream) &
 		{
 			if (lmDtNy.tellg() == std::string::npos)
 			{
-				std::cerr<<"Error: Less values than expected in "<<row<< " row "<<column<< " column "<<std::endl;
-				return false;
+				throw std::string("Error: Less values than expected in " + std::to_string(row) +  " row " + std::to_string(column) + " column\n");
 			}
 
 			std::getline(lmDtNy, token, '|');
@@ -361,20 +352,17 @@ bool TM::TuringMachine::setConfiguration(const std::stringstream& stream) &
 						
 			if(std::find(this->alphabetSymbols.begin(), this->alphabetSymbols.end(), ltoken) == this->alphabetSymbols.end())
 			{
-				std::cerr<<"Error: Unknows output value "<< ltoken<<" in "<<row<<" row "<<column<<" column "<<std::endl;
-				return false;
+				throw std::string("Error: Unknows output value " + std::string(ltoken,1) + " in " + std::to_string(row) + " row " + std::to_string(column) + " column \n");
 			}
 
 			if(std::find(this->stateSymbols.begin(), this->stateSymbols.end(), rtoken) == this->stateSymbols.end())
 			{
-				std::cerr<<"Error: Unknown state value "<< rtoken<<" in "<<row<<" row "<<column<<" column "<<std::endl;
-				return false;
+				throw std::string("Error: Unknown state value " + std::string(rtoken,1) + " in " + std::to_string(row) + " row " + std::to_string(column) + " column\n");
 			}
 			
 			if(std::find(TuringMachine::dir.begin(), TuringMachine::dir.end(), dirtoken) == TuringMachine::dir.end())
 			{
-				std::cerr << "Error: Unknown direction value " << dirtoken << " in " << row << " row " << column << " column " << std::endl;
-				return false;
+				throw std::string("Error: Unknown direction value " +  std::string(dirtoken,1) + " in " + std::to_string(row) + " row " + std::to_string(column) + " column\n");
 			}
 			
 			this->lambda[std::make_pair(this->stateSymbols[row], this->alphabetSymbols[column])] = rtoken;
@@ -384,8 +372,7 @@ bool TM::TuringMachine::setConfiguration(const std::stringstream& stream) &
 		
 		if(lmDtNy.tellg() != std::string::npos)
 		{
-			std::cerr<<"Error: More values in " << row << " row than expected" << std::endl;
-			return false;
+			throw std::string("Error: More values in " + std::to_string(row) + " row than expected\n");
 		}
 	}
 	
@@ -400,8 +387,7 @@ bool TM::TuringMachine::setConfiguration(const std::stringstream& stream) &
 		
 		if(data.tellg() == std::string::npos)
 		{
-			std::cerr<<"Error: Initial state value is not given\n";
-			return false;
+			throw std::string("Error: Initial state value is not given\n");
 		}
 	}
 	
@@ -409,8 +395,7 @@ bool TM::TuringMachine::setConfiguration(const std::stringstream& stream) &
 	
 	if (std::find(this->stateSymbols.begin(), this->stateSymbols.end(), token) == this->stateSymbols.end())
 	{
-		std::cerr<<"Error: Unknown initial state value "<<token<<std::endl;
-		return false;
+		throw std::string("Error: Unknown initial state value " + token + "\n");
 	}
 	
 	this->initalState = token;
@@ -426,8 +411,7 @@ bool TM::TuringMachine::setConfiguration(const std::stringstream& stream) &
 		
 		if(data.tellg() == std::string::npos)
 		{
-			std::cerr<<"Error: Halt state value is not given\n";
-			return false;
+			throw std::string("Error: Halt state value is not given\n");
 		}
 	}
 	
@@ -436,8 +420,7 @@ bool TM::TuringMachine::setConfiguration(const std::stringstream& stream) &
 	
 	if (std::find(this->stateSymbols.begin(), this->stateSymbols.end(), token) == this->stateSymbols.end())
 	{
-		std::cerr<<"Error: Unknown halt state value "<<token<<std::endl;
-		return false;
+		throw std::string("Error: Unknown halt state value " + token + "\n");
 	}
 	
 	this->haltState = token;
@@ -454,8 +437,7 @@ bool TM::TuringMachine::setConfiguration(const std::stringstream& stream) &
 		
 		if(data.tellg() == std::string::npos)
 		{
-			std::cerr<<"Error: Empty symbol value is not given\n";
-			return false;
+			throw std::string("Error: Empty symbol value is not given\n");
 		}
 	}
 	
@@ -464,8 +446,7 @@ bool TM::TuringMachine::setConfiguration(const std::stringstream& stream) &
 	
 	if (this->alphabetSymbols.find(ctoken) == std::string::npos)			
 	{
-		std::cerr<<"Error: Enknown empty symbol state value "<<token<<std::endl;
-		return false;
+		throw std::string("Error: Enknown empty symbol state value " + token + "\n");
 	}
 	
 	this->emptySymbol = ctoken;
@@ -479,7 +460,6 @@ bool TM::TuringMachine::setConfiguration(const std::stringstream& stream) &
 	this->print();
 #endif
 	
-	return true;
 }
 
 void TM::TuringMachine::print()
@@ -529,6 +509,6 @@ void TM::setExtedSize(const size_t size)
 	}
 	else
 	{
-		std::cerr << "Error: Invalid exted size value.\n";
+		throw std::string("Error: Invalid exted size value.\n");
 	}
 }
